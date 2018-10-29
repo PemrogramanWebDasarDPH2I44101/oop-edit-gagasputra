@@ -1,30 +1,117 @@
-<table border=1>
-    <thead>
-        <th>Nama</th>
-        <th>Nim</th>
-        <th>Tanggal Lahir</th>
-        <th>Aksi</th>
-    </thead>
-    <tbody>
 <?php
-if (mysqli_num_rows($result) > 0) {
-    while($row = mysqli_fetch_assoc($result)) {
-        $nim = $row['nim'];
-        echo "<tr>";
-        echo "<td>" . $row["nama"]. "</td>"; 
-        echo "<td>" . $row["nim"]. "</td>";
-        echo "<td>" . $row["tgl_lahir"]. "</td>";
-        echo "<td>
-            <a href='form_edit.php?nim=$nim'>Edit</a> | 
-            <a href='delete.php?nim=$nim'>Hapus</a> | 
-            
-            </td>";
-        echo "</tr>";
+    class Data {
+        private $connect;
+
+        public function Data() {
+            $servername = "localhost";
+            $username   = "root";
+            $password   = "";
+            $database   = "db_oop";
+
+            $this->connect = mysqli_connect ($servername, $username, $password, $database);
+        }
+
+        public function insert() {
+            $nim    = $_POST['nim'];
+            $nama   = $_POST['nama'];
+            $kelas   = $_POST['kelas'];
+
+            $foto = $_FILES['file']['name'];
+            $tmp_foto = $_FILES['file']['tmp_name'];
+            $dir = "foto/";
+            $target = $dir.$foto;
+
+            move_uploaded_file($tmp_foto, $target);
+
+            $database = "INSERT INTO mahasiswa (nim, nama, kelas, foto) VALUES ('$nim', '$nama', '$kelas', '$target')";
+            if (mysqli_query($this->connect, $database)) {
+                ?>
+                <script>
+                    alert("Upload Berhasil");
+                    location= "index.php";
+                </script>
+                <?php
+            } else {
+                ?>
+                <script>
+                    alert("Upload Gagal");
+                    location= "index.php";
+                </script>
+                <?php
+            }
+        }
+
+        public function view() {
+            $database = "SELECT * FROM mahasiswa";
+            return mysqli_query ($this->connect , $database);
+        }
+
+        public function select_data($nim) {
+            $database = "SELECT * FROM mahasiswa WHERE nim = '$nim'";
+            return mysqli_query($this->connect, $database);
+        }
+
+        public function update() {
+            $nim    = $_POST['nim'];
+            $nama   = $_POST['nama'];
+            $kelas   = $_POST['kelas'];
+
+            $foto = $_FILES['file']['name'];
+            $tmp_foto = $_FILES['file']['tmp_name'];
+            $dir = "foto/";
+            $target = $dir.$foto;
+
+            move_uploaded_file($tmp_foto, $target);
+
+            $database = "UPDATE mahasiswa SET nama = '$nama', kelas = '$kelas', foto = '$target' WHERE nim = '$nim'";
+            if (mysqli_query($this->connect, $database)) {
+                ?>
+                <script>
+                    alert("Edit Berhasil");
+                    location= "index.php";
+                </script>
+                <?php
+            } else {
+                ?>
+                <script>
+                    alert("Edit Gagal")
+                </script>
+                <?php
+            }
+        }
+
+        public function delete($nim) {
+            $database = "DELETE FROM mahasiswa WHERE nim = '$nim'";
+            if (mysqli_query($this->connect, $database)) {
+                ?>
+                <script>
+                    alert("Delete Berhasil");
+                    location= "index.php";
+                </script>
+                <?php
+            } else {
+                ?>
+                <script>
+                    alert("Delete Gagal");
+                    location= "index.php";
+                </script>
+                <?php
+            }
+        } 
     }
-} else {
-    echo "0 results";
-}
-mysqli_close($conn);
-?> 
-    </tbody>
-</table>
+
+    $data = new Data();
+    if (isset($_GET['insert'])) {    
+        $data -> insert();
+    }
+
+    if (isset($_GET['update'])) {
+        $data -> update();
+    }
+
+    if (isset($_GET['delete'])) {
+        $data -> delete($_GET['delete']);
+    }
+
+    
+?>
