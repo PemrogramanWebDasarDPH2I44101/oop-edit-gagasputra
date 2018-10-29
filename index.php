@@ -1,24 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title> Data Mahasiswa </title>
+    <link rel="stylesheet" href="css\bootstrap.min.css">
 </head>
 <body>
-    <form action="class.php" method="post">
-        Masukan angka 1<input type="text" name="input1"><br>
-        Masukan angka 2<input type="text" name="input2"><br>
-        Pilih Operasi
-        <select name="operasi">
-            <option value="+">+</option>
-            <option value="-">-</option>
-            <option value="*">*</option>
-            <option value="/">/</option>
-        </select>
-        <br>
-        <input type="submit" value="Kirim">
-    </form>
+    <div class="container">
+    <a href="insert.php"><input type="button" value="Tambah Data" class="btn btn-primary"></a>
+        <div class="row">
+            <div class="col">
+                <table class="table table-hover text-center">
+                    <thead>
+                        <tr>
+                            <th> NIM </th>
+                            <th> Nama </th>
+                            <th> Hobi </th>
+                            <th width="15%"> Foto </th>
+                            <th> Action </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                            require("data.php");
+                            $result = $data -> view();
+                            $isi = mysqli_num_rows($result);
+
+                            if($isi != 0) {
+                                while($row = mysqli_fetch_assoc($result)) {
+                                    ?>
+                                    <tr>
+                                        <td><?php echo $row['nim']; ?></td>
+                                        <td><?php echo $row['nama']; ?></td>
+                                        <td><?php echo $row['kelas']; ?></td>
+                                        <td><img src="<?php echo $row['foto']; ?>" width="100%"></td>
+                                        <td><a href="update.php?nim=<?php echo $row['nim']; ?>"><input type="button" value="Edit" class="btn btn-primary"></a> <a href="data.php?delete=<?php echo $row['nim']; ?>"><input type="button" value="Delete" class="btn btn-danger"></a></td>
+                                    </tr>
+                                    <?php
+                                }
+                            }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
